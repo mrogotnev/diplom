@@ -1,0 +1,11 @@
+cluster:
+  host: "172.16.4.1:8006"
+  user: root@pam
+  pass: autohost1
+
+db:
+  host: "5.227.126.92"
+  port: 5432
+  user: proxmox
+  pass: "Qwerty!23"
+  database: diplom
