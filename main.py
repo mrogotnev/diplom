@@ -13,6 +13,7 @@ from proxmoxer import ProxmoxAPI
 proxmox = ProxmoxAPI(config['cluster']['host'], user=config['cluster']['user'],
                      password=config['cluster']['pass'], verify_ssl=False)
 
+pprint.pprint(proxmox.cluster.resources.get(type='vm'))
 # while True:
 #     nodes_dict = proxmox.nodes.get()
 #     for node in nodes_dict:

@@ -47,7 +47,7 @@ while True:
 
 
         sql_request = "INSERT INTO vm_status VALUES (%s, %s, %s, %s, %s, %s);"
-        data = (vm['name'], vm['vmid'], vm['node'], vm['maxcpu'], vm['maxmem'] /1024/1024 , vm['maxdisk'] /1024/1024, )
+        data = (vm['name'], vm['vmid'], vm['node'], int(vm['cpu'] * 100), vm['maxmem'] /1024/1024 , vm['maxdisk'] /1024/1024, )
         pg_cursor.execute(sql_request, data)
 
         #pg_cursor.execute(sql_request)

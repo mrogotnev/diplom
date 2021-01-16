@@ -26,7 +26,7 @@ while True:
     pg_cursor.execute("DELETE FROM node_status")
     for node in proxmox.cluster.resources.get(type='node'):
         if node['status'] in 'online':
-            node_max_cpu = node['maxcpu']
+            node_max_cpu = 100
             node_max_ram = node['maxmem']
             node_max_disk = 0
             # находим максимальное место диска через жопу
@@ -42,7 +42,7 @@ while True:
             for vm in proxmox.cluster.resources.get(type='vm'):
                 if vm['node'] in node['node'] and vm['status'] in 'running':
 #                    print("vm - {vm_name}\tcpu={vm_cpu}\tram={vm_ram}\tdisk={vm_disk}".format(vm_name=vm['name'], vm_cpu=vm['maxcpu'], vm_ram=vm['maxmem'],vm_disk=vm['maxdisk']))
-                    node_cpu_reserved += int(vm['maxcpu'])
+                    node_cpu_reserved += int(vm['cpu'] * 100)
                     node_ram_reserved += int(vm['maxmem'])
                     node_disk_reserved += int(vm['maxdisk'])
 #            print("max_cpu={cpu}\tmax_ram={ram}\tmax_disk={disk}".format(cpu=node_max_cpu, ram=node_max_ram, disk=node_max_disk))
