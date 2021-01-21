@@ -40,47 +40,48 @@ def extract_available_resources_data(dead_host, pg_client):
 
 dead_host = "autohost3"
 
-with open(r'./config.yml') as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
-
-pg_client = pg_connect(host=config['db']['host'],
-                        port=config['db']['port'],
-                        user=config['db']['user'],
-                        password=config['db']['pass'],
-                        dbname=config['db']['database'])
-
-proxmox = ProxmoxAPI(config['cluster']['host'], user=config['cluster']['user'],
-                     password=config['cluster']['pass'], verify_ssl=False)
-
-mark_as_dead(dead_host, pg_client)
-vm_from_dead_node = extract_last_vm_data(dead_host, pg_client)
+# with open(r'./config.yml') as file:
+#     config = yaml.load(file, Loader=yaml.FullLoader)
+#
+# pg_client = pg_connect(host=config['db']['host'],
+#                         port=config['db']['port'],
+#                         user=config['db']['user'],
+#                         password=config['db']['pass'],
+#                         dbname=config['db']['database'])
+#
+# proxmox = ProxmoxAPI(config['cluster']['host'], user=config['cluster']['user'],
+#                      password=config['cluster']['pass'], verify_ssl=False)
+#
+# mark_as_dead(dead_host, pg_client)
+#
+# vm_from_dead_node = extract_last_vm_data(dead_host, pg_client)
 
 #vm_from_dead_node_sorted = sort_by_priority(vm_from_dead_node)
 
 #print(vm_from_dead_node)
-available_resources = extract_available_resources_data(dead_host, pg_client)
-#print(available_resources)
-
-vm_to_transfer = {}
-vm_saved = []
-
-for vm in vm_from_dead_node:
-    for available_node in available_resources:
-        if available_resources[available_node]['cpu'] - vm_from_dead_node[vm]['cpu'] > 0 and available_resources[available_node]['ram'] - vm_from_dead_node[vm]['ram'] > 0 and available_resources[available_node]['disk'] - vm_from_dead_node[vm]['disk'] > 0:
-            print("we will transfer %s on %s" % (vm, available_node))
-            print("%s\t cpu - %s\t ram - %s\t disk - %s" % (vm, vm_from_dead_node[vm]['cpu'], vm_from_dead_node[vm]['ram'], vm_from_dead_node[vm]['disk']))
-            print("%s\t cpu - %s\t ram - %s\t disk - %s" % (available_node, available_resources[available_node]['cpu'], available_resources[available_node]['ram'], available_resources[available_node]['disk']))
-            vm_to_transfer[vm_from_dead_node[vm]['id']] = available_node
-            available_resources[available_node]['cpu'] = available_resources[available_node]['cpu'] - vm_from_dead_node[vm]['cpu']
-            available_resources[available_node]['ram'] = available_resources[available_node]['ram'] - vm_from_dead_node[vm]['ram']
-            available_resources[available_node]['disk'] = available_resources[available_node]['disk'] - vm_from_dead_node[vm]['disk']
-            vm_saved.append(vm)
-
-### send to backup restore
-print(vm_to_transfer)
-
-for vm in vm_saved:
-    vm_from_dead_node.pop(vm)
-
-### send to email
-pprint.pprint(vm_from_dead_node)
+# available_resources = extract_available_resources_data(dead_host, pg_client)
+# #print(available_resources)
+#
+# vm_to_transfer = {}
+# vm_saved = []
+#
+# for vm in vm_from_dead_node:
+#     for available_node in available_resources:
+#         if available_resources[available_node]['cpu'] - vm_from_dead_node[vm]['cpu'] > 0 and available_resources[available_node]['ram'] - vm_from_dead_node[vm]['ram'] > 0 and available_resources[available_node]['disk'] - vm_from_dead_node[vm]['disk'] > 0:
+#             print("we will transfer %s on %s" % (vm, available_node))
+#             print("%s\t cpu - %s\t ram - %s\t disk - %s" % (vm, vm_from_dead_node[vm]['cpu'], vm_from_dead_node[vm]['ram'], vm_from_dead_node[vm]['disk']))
+#             print("%s\t cpu - %s\t ram - %s\t disk - %s" % (available_node, available_resources[available_node]['cpu'], available_resources[available_node]['ram'], available_resources[available_node]['disk']))
+#             vm_to_transfer[vm_from_dead_node[vm]['id']] = available_node
+#             available_resources[available_node]['cpu'] = available_resources[available_node]['cpu'] - vm_from_dead_node[vm]['cpu']
+#             available_resources[available_node]['ram'] = available_resources[available_node]['ram'] - vm_from_dead_node[vm]['ram']
+#             available_resources[available_node]['disk'] = available_resources[available_node]['disk'] - vm_from_dead_node[vm]['disk']
+#             vm_saved.append(vm)
+#
+# ### send to backup restore
+# print(vm_to_transfer)
+#
+# for vm in vm_saved:
+#     vm_from_dead_node.pop(vm)
+#
+# ### send to email
+# pprint.pprint(vm_from_dead_node)

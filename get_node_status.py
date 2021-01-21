@@ -5,23 +5,23 @@ import pprint
 import time
 
 
-with open(r'./config.yml') as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
-
-
-pg_client = pg_connect(host=config['db']['host'],
-                        port=config['db']['port'],
-                        user=config['db']['user'],
-                        password=config['db']['pass'],
-                        dbname=config['db']['database'])
-
-proxmox = ProxmoxAPI(config['cluster']['host'], user=config['cluster']['user'],
-                     password=config['cluster']['pass'], verify_ssl=False)
+# with open(r'./config.yml') as file:
+#     config = yaml.load(file, Loader=yaml.FullLoader)
+#
+#
+# pg_client = pg_connect(host=config['db']['host'],
+#                         port=config['db']['port'],
+#                         user=config['db']['user'],
+#                         password=config['db']['pass'],
+#                         dbname=config['db']['database'])
+#
+# proxmox = ProxmoxAPI(config['cluster']['host'], user=config['cluster']['user'],
+#                      password=config['cluster']['pass'], verify_ssl=False)
 
 # pprint.pprint(proxmox.cluster.resources.get(type='storage'))
 # exit(0)
 
-while True:
+def get_node_status(config, pg_client, proxmox):
     pg_cursor = pg_client.cursor()
     pg_cursor.execute("DELETE FROM node_status")
     for node in proxmox.cluster.resources.get(type='node'):
@@ -58,5 +58,5 @@ while True:
             pg_cursor.execute(sql_request, data)
             pg_client.commit()
 
-    time.sleep(30)
+    # time.sleep(30)
 ### available в базу
