@@ -32,25 +32,25 @@ def get_last_backup_archive(vm, node, proxmox):
     return last_backup_id
 
 
-def restore_from_backup(node, archive, pg_client):
+def restore_from_backup(node, archive, vmid, proxmox):
     restore = proxmox.nodes(node)
-    restore.qemu.create(vmid=get_new_vmid(pg_client), force=0, archive=archive)
+    restore.qemu.create(vmid=vmid, force=0, archive=archive)
 
 
-with open(r'./config.yml') as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
+# with open(r'./config.yml') as file:
+#     config = yaml.load(file, Loader=yaml.FullLoader)
 
-proxmox = ProxmoxAPI(config['cluster']['host'], user=config['cluster']['user'],
-                     password=config['cluster']['pass'], verify_ssl=False)
+# proxmox = ProxmoxAPI(config['cluster']['host'], user=config['cluster']['user'],
+#                      password=config['cluster']['pass'], verify_ssl=False)
+#
+# pg_client = pg_connect(host=config['db']['host'],
+#                         port=config['db']['port'],
+#                         user=config['db']['user'],
+#                         password=config['db']['pass'],
+#                         dbname=config['db']['database'])
 
-pg_client = pg_connect(host=config['db']['host'],
-                        port=config['db']['port'],
-                        user=config['db']['user'],
-                        password=config['db']['pass'],
-                        dbname=config['db']['database'])
 
+# recovery_dict = {106: 'autohost2'}
 
-recovery_dict = {106: 'autohost2'}
-
-for key, value in recovery_dict.items() :
-    restore_from_backup(node=value, archive=get_last_backup_archive(key, value, proxmox), pg_client=pg_client)
+# for key, value in recovery_dict.items():
+#     restore_from_backup(node=value, archive=get_last_backup_archive(key, value, proxmox), pg_client=pg_client, vmid=get_new_vmid(pg_client))

@@ -1,7 +1,7 @@
 cluster:
 #  host: "172.16.4.1:8006"
 #  host_new: {autohost1: "172.16.4.1:8006", autohost2: "172.16.4.2:8006", autohost3: "172.16.4.3:8006"}
-  host: {autohost1: "172.16.4.1:8006", autohost2: "172.16.4.2:8006"}
+  host: {autohost1: "172.16.4.1:8006", autohost2: "172.16.4.2:8006", autohost3: "172.16.4.3:8006"}
   user: root@pam
   pass: autohost1
 

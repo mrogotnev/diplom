@@ -1,19 +1,15 @@
-import proxmoxer
-import requests
 import yaml
-import subprocess
-import json
-import pprint
 import time
 import argparse
 from psycopg2 import connect as pg_connect
 from initializator import initializator
 from proxmox_connecter import proxmox_connector
-from priority_management import set_priority, get_vm_by_priority, get_non_res
+from priority_management import set_priority
 from get_node_status import get_node_status
 from get_vm_status import get_vm_status
 from disaster_counter import detect_disaster
 import recovery_protocol
+from backup_restore import restore_from_backup, get_last_backup_archive, get_new_vmid
 
 
 with open(r'./config.yml') as file:
@@ -44,34 +40,36 @@ if args.v is not None and args.p is not None and args.p >= 0:
     print(args.p)
     set_priority(pg_client, vm=args.v, priority=args.p)
 
-### test get_vm_by_priority
-# vm_list = get_vm_by_priority(pg_client)
-#
-# for vm in vm_list:
-#     print(vm[0])
-
-
 ### main body
-# while True:
-#     proxmox = proxmox_connector(config, pg_client)
-#     is_dead = detect_disaster(proxmox)
-#     if is_dead is not None:
-#         print("host is dead")
-#         print(is_dead['node'])
-#         recovery_protocol.mark_as_dead(dead_host=is_dead['node'], pg_client=pg_client)
-#         recovery_list = []
-#         priority_list = []
-#         sorted_recovery_list = []
-#         non_res_list = []
-#         for vm in get_vm_by_priority(pg_client):
-#             priority_list.append(vm[0])
-#         for vm in get_non_res(pg_client):
-#             non_res_list.append(vm[0])
-#
-#
-#
-#     get_node_status(config, pg_client, proxmox)
-#     get_vm_status(config, pg_client, proxmox)
-#     time.sleep(60)
+while True:
+    proxmox = proxmox_connector(config, pg_client)
+    is_dead = detect_disaster(proxmox, pg_client)
+    if is_dead is not None:
+        print("host is dead")
+        print(is_dead['node'])
+        recovery_protocol.mark_as_dead(dead_host=is_dead['node'], pg_client=pg_client)
+        recovery_dict = recovery_protocol.extract_last_vm_data(pg_client, dead_host=is_dead['node'])
+        available_res = recovery_protocol.extract_available_resources_data(pg_client, dead_host=is_dead['node'])
+        vm_to_transfer = recovery_protocol.get_vm_to_transfer(vm_from_dead_node=recovery_dict, available_resources=available_res)
+        print("debug")
+        print(vm_to_transfer)
+        restore_count = 0
+        for key, value in vm_to_transfer.items():
+            print("restoring %s on %s" % (key, value))
+            restore_from_backup(node=value, archive=get_last_backup_archive(key, value, proxmox), vmid=get_new_vmid(pg_client) + restore_count, proxmox=proxmox)
+            restore_count += 1
 
-print(recovery_protocol.extract_last_vm_data('autohost3', pg_client=pg_client))
+    get_node_status(config, pg_client, proxmox)
+    get_vm_status(config, pg_client, proxmox)
+    time.sleep(60)
+
+
+#print(get_vm_by_priority(pg_client, 'autohost2'))
+#print(recovery_protocol.extract_last_vm_data(pg_client, 'autohost2'))
+# recovery_dict = recovery_protocol.extract_last_vm_data(pg_client, dead_host='autohost2')
+# print(recovery_dict)
+# available_res = recovery_protocol.extract_available_resources_data(pg_client, dead_host='autohost2')
+# vm_to_transfer = recovery_protocol.get_vm_to_transfer(vm_from_dead_node=recovery_dict,
+#                                                       available_resources=available_res)
+#
+# print(vm_to_transfer)

@@ -1,6 +1,7 @@
 from proxmoxer import ProxmoxAPI
 import yaml
 import time
+from recovery_protocol import if_alive
 
 
 def counter(sus_node, disaster_count, proxmox):
@@ -31,9 +32,9 @@ def get_node_status(nodes, target_node):
 # proxmox = ProxmoxAPI(config['cluster']['host'], user=config['cluster']['user'],
 #                      password=config['cluster']['pass'], verify_ssl=False)
 
-def detect_disaster(proxmox):
+def detect_disaster(proxmox, pg_client):
     for node in get_nodes(proxmox):
-        if node['status'] != 'online':
+        if node['status'] != 'online' and if_alive(pg_client, node['node']):
             print("not responding: " + node['node'])
             is_dead = counter(node['node'], 1, proxmox)
             if is_dead is True:

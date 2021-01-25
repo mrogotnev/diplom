@@ -12,13 +12,13 @@ def set_priority(pg_client, vm, priority):
     exit(0)
 
 
-def get_vm_by_priority(pg_client):
-    pg_cursor = pg_client.cursor()
-    pg_cursor.execute("SELECT vm FROM vm_priority WHERE priority > 0 ORDER BY priority DESC")
-    return pg_cursor.fetchall()
+# def get_vm_by_priority(pg_client, hostname):
+#     pg_cursor = pg_client.cursor()
+#     pg_cursor.execute("SELECT s.vm_name FROM vm_status s INNER JOIN vm_priority p ON s.vm_name = p.vm WHERE node_name = '%s' ORDER BY priority DESC" % hostname)
+#     return pg_cursor.fetchall()
 
 
-def get_non_res(pg_client):
-    pg_cursor = pg_client.cursor()
-    pg_cursor.execute("SELECT vm FROM vm_priority WHERE priority = 0 ORDER BY priority DESC")
-    return pg_cursor.fetchall()
+# def get_non_res(pg_client):
+#     pg_cursor = pg_client.cursor()
+#     pg_cursor.execute("SELECT vm FROM vm_priority WHERE priority = 0 ORDER BY priority DESC")
+#     return pg_cursor.fetchall()
